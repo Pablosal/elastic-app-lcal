@@ -1,52 +1,45 @@
-import { useEffect, useState } from 'react';
+import {
+  DataSearch,
+  ReactiveBase,
+  ReactiveList,
+} from '@appbaseio/reactivesearch';
 import './App.css';
-var axios = require('axios');
 
 function App() {
-  const [query, setQuery] = useState('');
-  const [matches, setMatches] = useState(null);
-  const getSuggestions = () => {
-    if (query === '') return;
-    var config = {
-      method: 'get',
-      url: `http://localhost:9200/productos/_search?q=${query}`,
-      headers: {},
-    };
-
-    axios(config)
-      .then(function (response) {
-        const arr = response.data.hits.hits;
-        setMatches(arr);
-        console.log(response);
-        console.log({ arr });
-        // setMatches(myRes);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
-  const onChange = (e) => {
-    setQuery(e.target.value);
-  };
-  useEffect(() => {
-    getSuggestions(query);
-  }, [query]);
   return (
     <div className="App">
       <header className="App-header">
-        <form>
-          <input type="text" value={query} onChange={onChange} />
-        </form>
-
-        <div>
-          <h1>Productos Encontrados</h1>
-          <ul>
-            {matches &&
-              matches.map((item, idx) => (
-                <li key={idx}>{item._source.nombre}</li>
-              ))}
-          </ul>
-        </div>
+        <h1>Productos</h1>
+        <ReactiveBase
+          url="https://products-rhpmaap-arc.searchbase.io"
+          app="productos"
+          credentials="1e5b831982ad:9a600159-dff6-4ba0-a60b-f4da8b6119d6"
+          enableAppbase
+        >
+          <DataSearch
+            componentId="searchbox"
+            highlight={true}
+            size={10}
+            dataField={['nombre']}
+            placeholder="Search for books or authors"
+          />
+          <ReactiveList
+            componentId="SearchResult"
+            dataField="image"
+            react={{
+              and: ['CitySensor', 'SearchSensor'],
+            }}
+            renderItem={(res) => {
+              console.log(res);
+              return (
+                <div key={res._id}>
+                  <h2>{res.nombre}</h2>
+                  <img height="200" src={res.image} alt="" />
+                </div>
+              );
+            }}
+          />
+        </ReactiveBase>
       </header>
     </div>
   );
