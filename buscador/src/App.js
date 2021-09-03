@@ -18,16 +18,20 @@ function App() {
         >
           <DataSearch
             componentId="searchbox"
-            highlight={true}
             size={10}
             dataField={['nombre']}
-            placeholder="Search for books or authors"
+            placeholder="Busca tus productos"
+            onValueSelected={(value, cause, source) => {
+              console.log({ source });
+            }}
           />
           <ReactiveList
             componentId="SearchResult"
             dataField="image"
+            size={10}
+            pagination
             react={{
-              and: ['CitySensor', 'SearchSensor'],
+              and: ['searchbox'],
             }}
             renderItem={(res) => {
               console.log(res);
